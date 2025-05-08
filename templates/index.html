@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>ToDoアプリ</title>
+</head>
+<body>
+  <h1>ToDoリスト</h1>
+
+  <!-- カテゴリ & キーワードフィルタフォーム -->
+  <form method="get" action="{{ url_for('index') }}">
+    <label>カテゴリ：</label>
+    <select name="category">
+      <option value="">すべて表示</option>
+      {% for cat in categories %}
+        <option value="{{ cat }}" {% if cat == selected_category %}selected{% endif %}>{{ cat }}</option>
+      {% endfor %}
+    </select>
+    <label>キーワード：</label>
+    <input type="text" name="keyword" placeholder="検索ワード" value="{{ keyword }}">
+    <button type="submit">絞り込み</button>
+  </form>
+
+  <!-- タスク追加フォーム -->
+  <form action="{{ url_for('add') }}" method="post">
+    <input type="text" name="title" placeholder="タイトル" required>
+    <input type="text" name="description" placeholder="詳細">
+    <input type="text" name="category" placeholder="カテゴリ">
+    <button type="submit">追加</button>
+  </form>
+
+  <ul>
+    {% for task in tasks %}
+      <li>
+        <strong>{{ task.title }}</strong>
+        （{{ task.category or '未分類' }}）: {{ task.description }}
+        {% if task.completed %}
+          [完了]
+        {% else %}
+          [未完了]
+        {% endif %}
+        <form action="{{ url_for('toggle_complete', task_id=task.id) }}" method="post" style="display:inline;">
+          <button type="submit">切り替え</button>
+        </form>
+        <form action="{{ url_for('delete', task_id=task.id) }}" method="post" style="display:inline;">
+          <button type="submit">削除</button>
+        </form>
+      </li>
+    {% else %}
+      <li>タスクはありません</li>
+    {% endfor %}
+  </ul>
+</body>
+</html>
